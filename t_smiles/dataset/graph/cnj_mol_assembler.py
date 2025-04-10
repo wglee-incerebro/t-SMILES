@@ -11,14 +11,14 @@ import rdkit
 from rdkit import Chem
 from rdkit.Chem.EnumerateStereoisomers import EnumerateStereoisomers
 
-from DataSet.STDTokens import CTokens, STDTokens_Frag_File
-from DataSet.Graph.CNJTMol import CNJTMolTreeNode, CNJTMolTree
-from DataSet.Graph.CNJMolUtil import CNJMolUtil
-from DataSet.JTNN.MolTree import MolTreeNode, MolTreeUtils
-from DataSet.JTNN.ChemUtils import ChemUtils
-from MolUtils.RDKUtils.Frag.RDKFragUtil import RDKFragUtil,CODE_Alg
-from MolUtils.RDKUtils.RDKAssembling import RDKAssembling
-from MolUtils.RDKUtils.Utils import RDKUtils
+from t_smiles.dataset.std_tokens import CTokens, STDTokens_Frag_File
+from t_smiles.dataset.graph.cnjt_mol import CNJTMolTreeNode, CNJTMolTree
+from t_smiles.dataset.graph.cnj_mol_util import CNJMolUtil
+from t_smiles.dataset.jtnn.mol_tree import MolTreeNode, MolTreeUtils
+from t_smiles.dataset.jtnn.chem_utils import ChemUtils
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_util import RDKFragUtil,CODE_Alg
+from t_smiles.mol_utils.rdk_utils.rdk_assembling import RDKAssembling
+from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
 
 
 def CNJASM_HParam():

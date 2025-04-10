@@ -1,5 +1,5 @@
 ﻿
-from Tools.MathUtils import BCMathUtils
+from t_smiles.tools.math_utils import BCMathUtils
 
 class Tokenlizer():
     def __init__(self, voc, invalid_token = '&'):

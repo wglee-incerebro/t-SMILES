@@ -9,7 +9,7 @@ import rdkit
 from rdkit import Chem
 
 
-from MolUtils.RDKUtils.Frag.RDKFragUtil import RDKFragUtil
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_util import RDKFragUtil
 
 class RDKEnumerateSmiles:
     def enumerate_smiles(base_sml, n_samples, code = 'smiles', isomericSmiles = True, kekuleSmiles = False):  #default values are same as RDKit

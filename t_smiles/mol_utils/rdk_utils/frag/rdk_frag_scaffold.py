@@ -1,19 +1,17 @@
 import copy
 
 import rdkit.Chem as Chem
+from rdkit.Chem.Scaffolds import MurckoScaffold
 
-from MolUtils.RDKUtils.Utils import RDKUtils
-from MolUtils.RDKUtils.Frag.RDKFragUtil import RDKFragUtil
+from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_util import RDKFragUtil
 
-from rdkit.Chem import Draw
-from rdkit.Chem import rdMMPA
-
-class RDKFragMMPA:
+class RDKFragScaffold:
     def decompose_dummy(mol,
                     break_ex        = False,  
                     break_long_link = False,  
-                    break_r_bridge  = False, 
-                    ):               
+                    break_r_bridge  = False,  
+                    ):                
         try:
             sml = Chem.MolToSmiles(mol, kekuleSmiles = True)
             mol = Chem.MolFromSmiles(sml)
@@ -24,9 +22,8 @@ class RDKFragMMPA:
             print('[RDKFragMMPA.decompose_dummy].Exception-ignore:', e.args)
 
         n_atoms = mol.GetNumAtoms()
-
         if n_atoms == 1:
-            cliques = [set(list(range(n_atoms)))]  
+            cliques = [set(list(range(n_atoms)))] 
             motif_str = [Chem.MolToSmiles(mol, kekuleSmiles = True)]
             edges = []
             dummy_atoms = []
@@ -50,7 +47,7 @@ class RDKFragMMPA:
 
             single_cliq = []
 
-            break_bonds, bond_idxs = RDKFragMMPA.find_break_bonds(mol)
+            break_bonds, bond_idxs = RDKFragScaffold.find_break_bonds(mol)
             if len(break_bonds) > 0:
                 frags_mol, frags_smarts, frags_sml, motifs_aidx, dummy_atoms = RDKFragUtil.GetMolFrags(mol, bond_idxs, addDummies = True)
 
@@ -73,7 +70,7 @@ class RDKFragMMPA:
                 motif_str = [Chem.MolToSmiles(mol, kekuleSmiles = True)]
                 edges = []
                 dummy_atoms = []
-                frags_smarts = motif_str
+                frags_smarts= motif_str
         
         except Exception as e:
             print(e.args)
@@ -85,11 +82,10 @@ class RDKFragMMPA:
 
         return cliques, edges, motif_str, dummy_atoms, frags_smarts
 
-
     def decompose(mol,
-                break_ex        = False,  
+                break_ex        = False, 
                 break_long_link = False, 
-                break_r_bridge  = False,  
+                break_r_bridge  = False, 
                 ):
         n_atoms = mol.GetNumAtoms()
         if n_atoms == 1:
@@ -100,7 +96,7 @@ class RDKFragMMPA:
 
         atom_cliques = {}
         for i in range(n_atoms):
-            atom_cliques[i] = set()  
+            atom_cliques[i] = set() 
 
         try:
             mol_bonds = mol.GetBonds()
@@ -111,7 +107,7 @@ class RDKFragMMPA:
 
             single_cliq = []
 
-            break_bonds, bond_idxs = RDKFragMMPA.find_break_bonds(mol)
+            break_bonds, bond_idxs = RDKFragScaffold.find_break_bonds(mol)
 
             if len(break_bonds) == 0:
                 return [list(range(n_atoms))], []
@@ -131,7 +127,7 @@ class RDKFragMMPA:
                         if mol.GetAtomWithIdx(c[1]).IsInRing() and not mol.GetAtomWithIdx(c[0]).IsInRing():
                             breaks.append(c)
 
-                        if break_long_link:  
+                        if break_long_link: 
                             if not mol.GetAtomWithIdx(c[1]).IsInRing() and not mol.GetAtomWithIdx(c[0]).IsInRing():
                                 breaks.append(c)
 
@@ -143,6 +139,7 @@ class RDKFragMMPA:
                 for b in breaks:
                     if b in cliques:
                         cliques.remove(b)
+            # end for break_ex
 
             cliques = RDKFragUtil.merge_cliques(cliques)
 
@@ -228,75 +225,67 @@ class RDKFragMMPA:
 
         except Exception as e:
             print(e.args)
-            print('RDKFragMMPA Exception: ', Chem.MolToSmiles(mol, kekuleSmiles = True ))
+            print('RDKFragMMPA Exception: ', Chem.MolToSmiles(mol, kekuleSmiles = True))
             cliques = [list(range(n_atoms))]
             edges = []
 
         return cliques, edges
 
    
-    def find_break_bonds(mol_in, maxCuts = 1):
+    def find_break_bonds(mol_in):
         mol = copy.deepcopy(mol_in)
         RDKUtils.add_atom_index(mol, prop = 'atomNote')
-
+           
         break_bonds = []
 
+        mol_atoms =  [int(atom.GetProp('atomNote')) for atom in  mol.GetAtoms()]
         mol_bonds = mol.GetBonds()
         n_bonds = len(mol_bonds)
+    
+        mol_sf = MurckoScaffold.GetScaffoldForMol(mol)
+        sml_sf = Chem.MolToSmiles(mol_sf)        
+        sf_bonds = mol_sf.GetBonds()
+        sf_atoms = [int(atom.GetProp('atomNote')) for atom in  mol_sf.GetAtoms()]        
 
-        sub_mols = []
+        for bond in mol_bonds:
+            if bond not in sf_bonds:
+                a1 = bond.GetBeginAtom()
+                a2 = bond.GetEndAtom()
 
-        sub_mols.append(mol)
-        sub_mols.append(Chem.MolFromSmiles('C'))
+                nba = int(a1.GetProp('atomNote'))
+                nbb = int(a2.GetProp('atomNote'))                   
 
-        fr = rdMMPA.FragmentMol(mol, maxCuts = maxCuts, resultsAsMols = True, maxCutBonds = n_bonds)
-        for f in fr:
-            ff = Chem.GetMolFrags(f[1], asMols=True)
-            sub_mols.append(ff[0])  
-            sub_mols.append(ff[1])  
-
-            (nba, nbb) = RDKFragUtil.get_dummy_bond_pair(ff[0], ff[1])
-            break_bonds.append((nba, nbb))
+                if ( nba in sf_atoms and nbb not in sf_atoms) or (nba  not in sf_atoms and nbb in sf_atoms):
+                    break_bonds.append((nba, nbb) if nba <nbb else (nbb, nba ))
 
         bond_idxs = []
         for bd in break_bonds:
             bond = mol.GetBondBetweenAtoms(bd[0], bd[1])
-            bidx = bond.GetIdx() 
+            bidx = bond.GetIdx() #[1, 2, 3, 4, 6]
             bond_idxs.append(bidx)
-
 
         return break_bonds, bond_idxs
 
 
+    def get_frag(mol_in):
+        break_bonds , bond_idxs= RDKFragScaffold.find_break_bonds(mol_in)   
+        frags_mol, frags_smarts, frags_sml, motifs_aidx, dummy_atoms = RDKFragUtil.GetMolFrags(mol_in, break_bonds)
 
-def test():
-    sml = 'CC(=O)Nc1c2C(=O)N(C3CCCCC3)[C@@](C)(C(=O)NC3CCCCC3)Cn2c2ccccc12'
+        mol_list = [mol_in]
+        mol_list.extend(frags_mol)
 
-    mols = []
-    mmm = Chem.MolFromSmiles(sml)
-    mols.append(mmm)
+        return break_bonds, frags_mol
 
-    mols.append(Chem.MolFromSmiles('P'))
 
-    maxCuts = 2
+def test_sml():
+    sml = 'Fc1cc(cc(F)c1)C[C@H](NC(=O)c1cc(cc(c1)C)C(=O)N(CCC)CCC)[C@H](O)[C@@H]1[NH2+]CCN(Cc2ccccc2)C1=O'
+    mol = Chem.MolFromSmiles(sml)
 
-    fr = rdMMPA.FragmentMol(mmm, maxCuts = maxCuts, resultsAsMols = True, maxCutBonds = 50)
-    fr_sml = rdMMPA.FragmentMol(mmm, maxCuts = maxCuts, resultsAsMols = False, maxCutBonds = 50)
-    fr_sml = set(fr_sml)
-    
-    for f in fr:
-        ff = Chem.GetMolFrags(f[1], asMols=True)
-        mols.append(ff[0])
-        mols.append(ff[1])
-
-    mols.append(Chem.MolFromSmiles('P'))
-    mols.append(Chem.MolFromSmiles('P'))
-
-    Draw.MolsToGridImage(mols, molsPerRow = 8,).show()
+    RDKFragScaffold.get_frag(mol)
 
     return 
 
-if __name__ == '__main__':
-    test()
 
-   
+
+if __name__ == '__main__':
+    test_sml()

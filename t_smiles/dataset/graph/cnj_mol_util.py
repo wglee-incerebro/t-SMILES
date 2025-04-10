@@ -6,8 +6,8 @@ from rdkit import Chem
 
 from Levenshtein import distance as levenshtein   #pip install python-Levenshtein
 
-from DataSet.STDTokens import CTokens
-from MolUtils.RDKUtils.RDKEnumerator import RDKEnumerateSmiles
+from t_smiles.dataset.std_tokens import CTokens
+from t_smiles.mol_utils.rdk_utils.rdk_enumerator import RDKEnumerateSmiles
 
 class CNJMolUtil:
     def valid_smiles(sml, ctoken = None, 

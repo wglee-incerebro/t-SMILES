@@ -2,7 +2,7 @@ from rdkit import Chem
 from rdkit import rdBase
 rdBase.DisableLog("rdApp.info")
 
-#from MolUtils.RDKUtils.RDKEdit import RDKEdit
+#from t_smiles.mol_utils.rdk_utils.rdk_edit import RDKEdit
 
 class RDKEdit():
     def copy_atom(atom, fromcharge = False, atommap=False):

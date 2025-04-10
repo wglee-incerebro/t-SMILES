@@ -1,12 +1,12 @@
-from DataSet.STDTokens import CTokens, STDTokens_Frag_File
+from t_smiles.dataset.std_tokens import CTokens, STDTokens_Frag_File
 
-from MolUtils.RDKUtils.Frag.RDKFragUtil import Fragment_Alg
-from DataSet.Graph.CNJMolAssembler import CNJMolAssembler
-from DataSet.Graph.CNJMolUtil import CNJMolUtil           
-from DataSet.Graph.CNJTMol import CNJMolUtils
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_util import Fragment_Alg
+from t_smiles.dataset.graph.cnj_mol_assembler import CNJMolAssembler
+from t_smiles.dataset.graph.cnj_mol_util import CNJMolUtil           
+from t_smiles.dataset.graph.cnjt_mol import CNJMolUtils
 
-from DataSet.Graph.CNJMolAssembler import rebuild_file
-from DataSet.Graph.CNJTMol import preprocess
+from t_smiles.dataset.graph.cnj_mol_assembler import rebuild_file
+from t_smiles.dataset.graph.cnjt_mol import preprocess
 
 
 
@@ -49,8 +49,8 @@ def test_decode():
     print('---test_decode---')
     maxlen = 512
     
-    vocab_file = r'../RawData/Chembl/Test/Chembl_test.smi.[MMPA_DY][237]_token.voc.smi'    #vs
-    #vocab_file = r'./RawData/Chembl/Test/Chembl_test.smi.[MMPA_DY][237]_token.voc.smi'      #vs code
+    #vocab_file = r'../RawData/Chembl/Test/Chembl_test.smi.[MMPA_DY][237]_token.voc.smi'    #vs
+    vocab_file = r'./RawData/Chembl/Test/Chembl_test.smi.[MMPA_DY][237]_token.voc.smi'      #vs code
 
     ctoken = CTokens(STDTokens_Frag_File(vocab_file), is_pad = True, pad_symbol = ' ', startend = True,
                      max_length = maxlen,  flip = False, invalid = True, onehot = False)

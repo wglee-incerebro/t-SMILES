@@ -3,8 +3,8 @@ import copy
 import rdkit.Chem as Chem
 from rdkit.Chem import BRICS
 
-from MolUtils.RDKUtils.Frag.RDKFragUtil import RDKFragUtil
-from MolUtils.RDKUtils.Utils import RDKUtils
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_util import RDKFragUtil
+from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
 
 class RDKFragBricsDummy:
     def decompose_dummy(mol,

@@ -1,8 +1,8 @@
 from builtins import str
 import numpy as np
 
-from DataSet.Tokenlizer import Tokenlizer
-from DataSet.JTNN.MolTree import Vocab
+from t_smiles.dataset.tokenlizer import Tokenlizer
+from t_smiles.dataset.jtnn.mol_tree import Vocab
 
 from enum import Enum
 class TokenEncoder(Enum):

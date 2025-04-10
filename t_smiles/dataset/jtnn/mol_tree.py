@@ -3,16 +3,16 @@ import copy
 
 import rdkit.Chem as Chem
 
-from DataSet.JTNN.ChemUtils import ChemUtils
-from MolUtils.RDKUtils.Utils import RDKUtils
+from t_smiles.dataset.jtnn.chem_utils import ChemUtils
+from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
 
 
-from MolUtils.RDKUtils.Frag.RDKFragUtil import Fragment_Alg
-from MolUtils.RDKUtils.Frag.RDKFragBrics import RDKFragBrics
-from MolUtils.RDKUtils.Frag.RDKFragBricsDummy import RDKFragBricsDummy
-from MolUtils.RDKUtils.Frag.RDKFragMMPA import RDKFragMMPA
-from MolUtils.RDKUtils.Frag.RDKFragScaffold import RDKFragScaffold
-from MolUtils.RDKUtils.Frag.RDKFragRBrics import RDKFragRBrics
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_util import Fragment_Alg
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_brics import RDKFragBrics
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_brics_dummy import RDKFragBricsDummy
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_mmpa import RDKFragMMPA
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_scaffold import RDKFragScaffold
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_r_brics import RDKFragRBrics
 
 
 class MolTreeUtils:

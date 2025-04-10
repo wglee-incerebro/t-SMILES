@@ -6,7 +6,7 @@ from collections import defaultdict
 import rdkit.Chem as Chem
 from rdkit.Chem.EnumerateStereoisomers import EnumerateStereoisomers, StereoEnumerationOptions
 
-from MolUtils.RDKUtils.Utils import RDKUtils
+from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
 
 class ChemUtils:
     MST_MAX_WEIGHT = 100 

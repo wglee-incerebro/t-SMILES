@@ -8,9 +8,9 @@ from rdkit.Chem import rdmolops
 from rdkit import rdBase
 rdBase.DisableLog("rdApp.info")
 
-from MolUtils.RDKUtils.Utils import RDKUtils
-from MolUtils.RDKUtils.Frag.RDKFragUtil import RDKFragUtil, JointPiece
-from Tools.StringUtils import StringUtils
+from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_util import RDKFragUtil, JointPiece
+from t_smiles.tools.string_utils import StringUtils
 
 class RDKAssembling():
 

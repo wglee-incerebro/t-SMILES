@@ -1,3 +1,9 @@
+# NOTE:
+# This file is not currently used in the refactored package structure.
+# It is preserved here for backward compatibility or future reference.
+# It requires `h5py`, which is NOT listed as a core dependency.
+# The previous path of this file was `t_smiles/dataset/utils.py`.
+
 import os
 import threading
 from networkx import exception
@@ -34,13 +40,13 @@ from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 
-from DataSet.STDTokens import CTokens
-#from DataSet.STDTokens import STDTokens_Common, STDTokens_SMI_All
-#from DataSet.STDTokens import STDTokens_ZincMoses, STDTokens_ZincSingle
-#from DataSet.STDTokens import STDTokens_ChemblDouble,STDTokens_ChemblSingle
+from t_smiles.dataset.std_tokens import CTokens
+#from t_smiles.dataset.std_tokens import STDTokens_Common, STDTokens_SMI_All
+#from t_smiles.dataset.std_tokens import STDTokens_ZincMoses, STDTokens_ZincSingle
+#from t_smiles.dataset.std_tokens import STDTokens_ChemblDouble,STDTokens_ChemblSingle
 
-from Tools.DataConv import BCDataConv
-from MolUtils.RDKUtils.Utils import RDKUtils
+from t_smiles.tools.DataConv import BCDataConv
+from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
 
 '''
 from sklearn.preprocessing import OneHotEncoder
@@ -50,15 +56,15 @@ print(y)
 [[1. 0. 0. 0. 0. 0. 0. 1.]
 [0. 0. 0. 0. 1. 1. 0. 0.]]
 '''
-from DataSet.STDDataLoader import CSTDDataLoader
+from t_smiles.dataset.STDDataLoader import CSTDDataLoader
 
-from DataSet.STDTokens import CTokens, STDTokens_Common 
-from DataSet.STDTokens import STDTokens_ZincMoses, STDTokens_ZincSingle
-from DataSet.STDTokens import STDTokens_ChemblDouble,STDTokens_ChemblSingle
+from t_smiles.dataset.std_tokens import CTokens, STDTokens_Common 
+from t_smiles.dataset.std_tokens import STDTokens_ZincMoses, STDTokens_ZincSingle
+from t_smiles.dataset.std_tokens import STDTokens_ChemblDouble,STDTokens_ChemblSingle
 
-from DataSet.Tokenlizer import Tokenlizer
+from t_smiles.dataset.tokenlizer import Tokenlizer
 
-#from DataSet.Utils import DSParam, SeqUtils
+#from t_smiles.dataset.utils import DSParam, SeqUtils
 def DSParam():  #'dict' 
     return {
         'data_path'      : './DataSet/ChEMBL/chembl_10.smi',

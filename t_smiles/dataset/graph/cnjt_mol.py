@@ -8,14 +8,14 @@ import networkx as nx
 
 import rdkit.Chem as Chem
 
-from Tools.GraphTools import GTools
-from Tools.MathUtils import BCMathUtils
-from DataSet.STDTokens import CTokens
-from DataSet.JTNN.MolTree import Vocab, MolTree
-from DataSet.STDTokens import CTokens, STDTokens_Frag_File
-from DataSet.Graph.CNJMolUtil import CNJMolUtil
-from DataSet.Graph.CNXBinaryTree import CNXBinaryTree        
-from MolUtils.RDKUtils.Frag.RDKFragUtil import Fragment_Alg
+from t_smiles.tools.graph_tools import GTools
+from t_smiles.tools.math_utils import BCMathUtils
+from t_smiles.dataset.std_tokens import CTokens
+from t_smiles.dataset.jtnn.mol_tree import Vocab, MolTree
+from t_smiles.dataset.std_tokens import CTokens, STDTokens_Frag_File
+from t_smiles.dataset.graph.cnj_mol_util import CNJMolUtil
+from t_smiles.dataset.graph.cnx_binary_tree import CNXBinaryTree        
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_util import Fragment_Alg
 
 class CNJTMolTreeNode():
     disconnect_char = '^'  

@@ -3,11 +3,11 @@ import pandas as pd
 
 import rdkit.Chem as Chem
 
-from MolUtils.RDKUtils.Utils import RDKUtils
+from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
 
-from Tools.StringUtils import StringUtils
+from t_smiles.tools.string_utils import StringUtils
 
-import MolUtils.datamol.datamol as dm
+import datamol as dm
 dm.disable_rdkit_log()
 
 

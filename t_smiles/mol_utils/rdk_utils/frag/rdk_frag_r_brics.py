@@ -3,10 +3,10 @@ import copy
 
 import rdkit.Chem as Chem
 
-from MolUtils.RDKUtils.Utils import RDKUtils
-from MolUtils.RDKUtils.Frag.RDKFragUtil import RDKFragUtil
+from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
+from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_util import RDKFragUtil
 
-from MolUtils.rBRICS.rBRICS_public import FindrBRICSBonds
+from t_smiles.third_party.rbrics.r_brics_public import FindrBRICSBonds
 
 class RDKFragRBrics:
     def decompose_dummy(mol,
