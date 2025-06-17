@@ -25,8 +25,8 @@ dependencies = [
     "python-Levenshtein"
 ]
 
-[tool.setuptools]
-packages = ["t_smiles"]
+[tool.setuptools.packages.find]
+where = ["."]
 
 [project.optional-dependencies]
 dev = ["pytest", "black", "ruff"]
