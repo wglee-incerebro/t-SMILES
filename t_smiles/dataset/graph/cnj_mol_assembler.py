@@ -19,7 +19,17 @@ from t_smiles.dataset.jtnn.chem_utils import ChemUtils
 from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_util import RDKFragUtil,CODE_Alg
 from t_smiles.mol_utils.rdk_utils.rdk_assembling import RDKAssembling
 from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
+from t_smiles.tools.graph_tools import GTools
 
+import importlib
+
+def str_to_callable(module_name: str, func_name: str):
+    try:
+        module = importlib.import_module(module_name)
+        return getattr(module, func_name)
+    except (ImportError, AttributeError) as e:
+        print(f"Error importing {func_name} from {module_name}: {e}")
+        return None
 
 def CNJASM_HParam():
     config = {
@@ -156,7 +166,6 @@ class CNJMolAssembler:
                     frags.append(nb.smiles)
                     frags_mol.append(Chem.MolFromSmiles(nb.smiles))
                     
-                new_mol = RDKBrics.build_mol(frags)
                 new_mol, _ = RDKAssembling.reconstruct_brics(frags_mol)
                 if new_mol is not None:
                     smiles = Chem.MolToSmiles(new_mol)
@@ -455,7 +464,7 @@ class CNJMolAssembler:
 
                 module_name = 'External.Guacamol.guacamol.standard_benchmarks'               
 
-                gfun = ModelUtils.str_to_class(module_name = module_name,  class_name = gfun_name)
+                gfun = str_to_callable(module_name = module_name,  func_name = gfun_name)
                 if gfun is not None:
                     gfun = gfun()
 
@@ -520,7 +529,7 @@ class CNJMolAssembler:
 
                     candidates = []
                     if hparam['candidate_mode'] == 'random_one':
-                        candidates = CNJMolAssembler.enum_assemble(node, neib, prev_nodes = [], prev_amap = [], alg = alg)
+                        candidates = CNJMolAssembler.enum_assemble(node, neib, prev_nodes = [], prev_amap = [], hparam = hparam)
                     else:  #candidate_tree
                         if len(node.candidates) == 0:
                             candidates = CNJMolAssembler.enum_assemble(node, neib, prev_nodes = [], prev_amap = [], hparam = hparam)
@@ -1026,7 +1035,7 @@ class CNJMolAssembler:
                 #External.Guacamol.guacamol.goal_directed_benchmark.GoalDirectedBenchmark
                 module_name = 'External.Guacamol.guacamol.standard_benchmarks'               
 
-                gfun = ModelUtils.str_to_class(module_name = module_name,  class_name = gfun_name)
+                gfun = str_to_callable(module_name = module_name,  func_name = gfun_name)
                 if gfun is not None:
                     gfun = gfun()
                     scores =  gfun.objective.score_list(sml_cands)

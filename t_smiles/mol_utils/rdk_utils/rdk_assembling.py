@@ -12,6 +12,8 @@ from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
 from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_util import RDKFragUtil, JointPiece
 from t_smiles.tools.string_utils import StringUtils
 
+import selfies as sf
+
 class RDKAssembling():
 
     def get_atomenv_table():
