@@ -75,7 +75,7 @@ class CNXBinaryTree(nx.DiGraph):
 
 
     def BFS(self, source=None,  reverse=False, depth_limit=None, sort_neighbors=None):
-        vlist = list(nx.bfs_tree(g, source = 0))
+        vlist = list(nx.bfs_tree(self, source = 0))
 
         return vlist
 

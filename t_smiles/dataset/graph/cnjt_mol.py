@@ -105,8 +105,8 @@ class CNJTMolTree(MolTree):
                         ):
         try:
             if standardize:
-                smiles = RKDMol.standardize(smiles)
-
+                # smiles = RDKMol.standardize(smiles)
+                smiles = Chem.MolStandardize.rdMolStandardize.StandardizeSmiles(smiles)
             super(CNJTMolTree, self).__init__(smiles = smiles, dec_alg = dec_alg, kekuleSmiles = kekuleSmiles, frg_random = frg_random)
                
             if self.mol is None:
@@ -1053,7 +1053,7 @@ class CNJTMolTree(MolTree):
         if show:
             GTools.show_network_g_cnjtmol(bt)
 
-        return g
+        return bt
 
 
 class CNJMolUtils:

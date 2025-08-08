@@ -95,32 +95,38 @@ Here we provide the source code of our method.
 Dependencies
 ============
 
-We recommend Anaconda to manage the version of Python and installed packages.
+We recommend using a virtual environment (e.g., `venv` or Anaconda) to manage Python and installed packages.
 
-Please make sure the following packages are installed:
+This version has been refactored into an installable Python package (`pip install -e .`), and the following dependencies are required:
 
-1.  Python(version \>= 3.7)
+1.  Python (>= 3.8)
+2.  [RDKit](https://www.rdkit.org/) (>= 2020.03)
+3.  [Datamol](https://github.com/datamol-io/datamol) (installable via pip)
+4.  Networkx (>= 2.4)
+5.  Numpy (>= 1.19)
+6.  Pandas (>= 1.2.2)
+7.  Matplotlib (>= 2.0)
+8.  Scipy (>= 1.4.1)
+9.  [python-Levenshtein](https://pypi.org/project/python-Levenshtein/)
 
-2.  [PyTorch](https://pytorch.org/) (version == 1.7)
-
-3.  [RDKit](https://www.rdkit.org/) (version \>= 2020.03)
-
-4.  Networkx(version \>= 2.4)
-
-5.  [Numpy](https://numpy.org/) (version \>= 1.19)
-
-6.  [Pandas](https://pandas.pydata.org/) (version \>= 1.2.2)
-
-7.  [Matplotlib](https://matplotlib.org/) (version \>= 2.0)
-
-8.  Scipy(version \>= 1.4.1)
-
-As to Datamol and rBRICS: please download them
-from <https://github.com/datamol-io/datamol> and <https://github.com/BiomedSciAI/r-BRICS> and
-copy them into the MolUtils folder.
+**Note:**  
+- PyTorch was previously listed as a dependency, but is **not currently used** in this version.
+- The `r-BRICS` codebase is now **bundled under `t_smiles/third_party/rbrics/`** and does not need to be copied manually.
 
 Usage
 =====
+
+Install the package in editable mode:
+
+```bash
+pip install -e .
+```
+
+Run the demonstration script (previously test.py):
+
+```bash
+python t_smiles/test.py
+```
 
 1.  **DataSet/Graph/CNJTMol.py**
 
@@ -170,3 +176,14 @@ We thank the following Git repositories that gave me a lot of inspirations:
 14. GPT2: <https://github.com/samwisegamjeee/pytorch-transformers>
 
 15. DIFFUMOL: https://github.com/ComputeSuda/DIFFUMOL
+
+License Notices
+===============
+
+This repository includes third-party code from the [r-BRICS project](https://github.com/BiomedSciAI/r-BRICS), which is redistributed under a BSD-style license.
+
+Copyright (c) 2009, Novartis Institutes for BioMedical Research Inc. All rights reserved. Copyright (c) 2006–2011 IBM LLC, Leili Zhang, Vasu Rao, Wendy Cornell All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the license terms are respected.
+
+For full license terms, see: `t_smiles/third_party/rbrics/LICENSE`
