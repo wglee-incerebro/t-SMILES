@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "t-smiles"
-version = "0.4.0+refactor.wglee"
+version = "0.4.0"
 description = "Fragment-based multiscale molecular representation (refactored version)"
 readme = "README.md"
 authors = [
@@ -27,6 +27,7 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["."]
+include = ["t_smiles*"]
 
 [project.optional-dependencies]
 dev = ["pytest", "black", "ruff"]
