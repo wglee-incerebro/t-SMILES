@@ -5,8 +5,11 @@ from collections import defaultdict
 
 import rdkit.Chem as Chem
 from rdkit.Chem.EnumerateStereoisomers import EnumerateStereoisomers, StereoEnumerationOptions
+import logging
 
 from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
+
+logger = logging.getLogger(__name__)
 
 class ChemUtils:
     MST_MAX_WEIGHT = 100 
@@ -94,8 +97,11 @@ class ChemUtils:
                 smiles  = Chem.MolFragmentToSmiles(new_mol, atoms, kekuleSmiles = True)#
                 new_mol = Chem.MolFromSmiles(smiles, sanitize=False)      
                 sml = Chem.MolToSmiles(new_mol) 
-        except Exception as e:
-            print(f'[ChemUtils.get_clique_mol].exception[kekuleSmiles={kekuleSmiles}]:', e.args)
+        except Exception:
+            logger.exception(
+                "ChemUtils.get_clique_mol failed",
+                extra={"ctx": f"kekuleSmiles={kekuleSmiles}"},
+            )
 
         return new_mol, sml
 
@@ -344,7 +350,10 @@ class ChemUtils:
                 #ncand = 20  #default
                 ncand = 5
                 if len(candidates) > ncand:  #A patchch to stop loop  
-                    print(f'ChemUtils[enum_assemble] len(candidates) > {ncand}')
+                    logger.info(
+                        "ChemUtils.enum_assemble candidates truncated",
+                        extra={"ctx": f"len={len(candidates)} ncand={ncand}"},
+                    )
                     break
 
             if len(candidates) == 0:
@@ -467,10 +476,10 @@ class ChemUtils:
 
             RDKUtils.show_mol_with_atommap(cur_mol, atommap= False)  
 
-        except Exception as e:
-            print(e.args)
+        except Exception:
+            logger.exception("ChemUtils.enum_assemble failed")
 
         return dec_smiles
 
 if __name__ == "__main__":
-    print('ChemUtils')
+    logger.info("ChemUtils")

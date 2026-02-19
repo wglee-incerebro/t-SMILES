@@ -2,6 +2,7 @@ import numpy as np
 import copy
 
 import rdkit.Chem as Chem
+import logging
 
 from t_smiles.dataset.jtnn.chem_utils import ChemUtils
 from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
@@ -13,6 +14,8 @@ from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_brics_dummy import RDKFragBricsD
 from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_mmpa import RDKFragMMPA
 from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_scaffold import RDKFragScaffold
 from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_r_brics import RDKFragRBrics
+
+logger = logging.getLogger(__name__)
 
 
 class MolTreeUtils:
@@ -190,7 +193,10 @@ class MolTree(object):
                 elif dec_alg == Fragment_Alg.BRICS:  
                     s_cliques, s_edges = RDKFragBrics.decompose_extra(s_mol)
                     if len(s_edges) <= 1:
-                        print('Mol could not be Bricsed:', smiles)
+                        logger.warning(
+                            "Mol could not be BRICS-decomposed, falling back to tree_decomp",
+                            extra={"ctx": f"smiles={smiles}"},
+                        )
                         s_cliques, s_edges = ChemUtils.tree_decomp(s_mol)
                 elif dec_alg == Fragment_Alg.BRICS_Base:
                     s_cliques, s_edges = RDKFragBrics.decompose_simple(s_mol)
@@ -272,9 +278,11 @@ class MolTree(object):
 
                 node.is_leaf = (len(node.neighbors) == 1)
 
-        except Exception as e:
-            print('[MolTree.init].Exception:',e.args)
-            print('[MolTree.init].Exception-smiles:',smiles)
+        except Exception:
+            logger.exception(
+                "MolTree.init failed",
+                extra={"ctx": f"smiles={smiles}"},
+            )
             self.mol = None
 
         return 

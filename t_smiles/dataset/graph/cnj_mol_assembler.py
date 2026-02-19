@@ -7,6 +7,7 @@ import copy
 
 import networkx as nx
 
+import logging
 import rdkit
 from rdkit import Chem
 from rdkit.Chem.EnumerateStereoisomers import EnumerateStereoisomers
@@ -20,15 +21,21 @@ from t_smiles.mol_utils.rdk_utils.frag.rdk_frag_util import RDKFragUtil,CODE_Alg
 from t_smiles.mol_utils.rdk_utils.rdk_assembling import RDKAssembling
 from t_smiles.mol_utils.rdk_utils.utils import RDKUtils
 from t_smiles.tools.graph_tools import GTools
+from t_smiles.tools.logging_utils import init_logging
 
 import importlib
+
+logger = logging.getLogger(__name__)
 
 def str_to_callable(module_name: str, func_name: str):
     try:
         module = importlib.import_module(module_name)
         return getattr(module, func_name)
     except (ImportError, AttributeError) as e:
-        print(f"Error importing {func_name} from {module_name}: {e}")
+        logger.exception(
+            "Error importing function",
+            extra={"ctx": f"module={module_name} func={func_name}"},
+        )
         return None
 
 def CNJASM_HParam():
@@ -204,10 +211,16 @@ class CNJMolAssembler:
             else:
                 raise ValueError('[enum_assemble] raise expection:', hparam['alg'])
 
-        except Exception as e:
-            print('[CNJMolAssembler.enum_assemble].Exception: ',e.args)
-            print('[CNJMolAssembler.enum_assemble].Exception.node', node.smiles)
-            print('[CNJMolAssembler.enum_assemble].Exception.neighbors', neighbors[0].smiles)
+        except Exception:
+            logger.exception(
+                "CNJMolAssembler.enum_assemble failed",
+                extra={
+                    "ctx": (
+                        f"node={getattr(node, 'smiles', None)} "
+                        f"neighbor={getattr(neighbors[0], 'smiles', None) if neighbors else None}"
+                    )
+                },
+            )
             candidates = node.candidates
          
         #print('[out]:[CNJMolAssembler.enum_assemble:]', candidates)
@@ -401,8 +414,8 @@ class CNJMolAssembler:
                
                     bfs_queue.append(node_right)
 
-        except Exception as e:
-            print(e.args)
+        except Exception:
+            logger.exception("Convert_to_JTMoltree failed")
        
 
         n_nodes = len(g.nodes)
@@ -442,7 +455,10 @@ class CNJMolAssembler:
         if len(candidates) < n_candidates:
             cands = candidates
         else:
-            print(f'[len of candidates]:{len(candidates)}, select the first {n_candidates} as target')
+            logger.info(
+                "Candidate list truncated",
+                extra={"ctx": f"len={len(candidates)} n_candidates={n_candidates}"},
+            )
 
             cands = []
             
@@ -643,16 +659,15 @@ class CNJMolAssembler:
                         candidates.extend(cands)
 
             if len(candidates) == 0:
-                print('assemble_one_node:Candidates is None! Try agin')
+                logger.warning("assemble_one_node: candidates empty, retrying")
                 try:
                     i = 1
                     while len(candidates) == 0 and i < len(neibs):
                         candidates = CNJMolAssembler.enum_assemble(node, neibs[0 : -i], prev_nodes = [], prev_amap = [], hparam = hparam)
                         i = i + 1
 
-                except Exception as e:
-                    print('assemble_one_node.enum_assemble again Exception!')
-                    print(e.args)
+                except Exception:
+                    logger.exception("assemble_one_node.enum_assemble retry failed")
 
 
             if len(candidates) > 10:
@@ -698,15 +713,14 @@ class CNJMolAssembler:
                         uvisited[node.idx] = 0
                         node.neighbors.clear()     
                 else:
-                    print('assemble_one_node:Candidates is None! Ignore assemble info, keep node smiles')
+                    logger.warning("assemble_one_node: candidates empty, keep node smiles")
                     if len(leave_nb) == 1:
                         uvisited[leave_nb[0].idx] = 1
                         uvisited[node.idx] = 0
                         node.neighbors.clear() 
                     
-        except Exception as e:
-            print('assemble_one_node.Exception!')
-            print(e.args)
+        except Exception:
+            logger.exception("assemble_one_node failed")
 
         return
 
@@ -749,9 +763,8 @@ class CNJMolAssembler:
 
             idx = uvisited.index(1)
             final = moltree.nodes[idx]
-        except Exception as e:
-            print('assemble_JTMolTree_degree_first.Exception:')
-            print(e.args)
+        except Exception:
+            logger.exception("assemble_JTMolTree_degree_first failed")
 
         return final
 
@@ -974,15 +987,15 @@ class CNJMolAssembler:
                     dec_sml_list.sort()
                     dec_sml = dec_sml_list
 
-            except Exception as e:
-                print('[[CNJMolAssembler.assemble_JTMolTree.select final].Exception',e.args)
+            except Exception:
+                logger.exception("assemble_JTMolTree select final failed")
                 if isinstance(cur_mol, rdkit.Chem.rdchem.Mol):
                     dec_sml = Chem.MolToSmiles(cur_mol)
                 else:
                     dec_sml = Chem.MolToSmiles(cur_mol[0])
 
-        except Exception as e:
-            print('[CNJMolAssembler.assemble_JTMolTree]:', e.args)
+        except Exception:
+            logger.exception("assemble_JTMolTree failed")
 
         return dec_sml
 
@@ -1078,8 +1091,8 @@ class CNJMolAssembler:
                 p_list.sort(key=lambda u:(-u[0]))
 
                 final_mol = p_list[0][1]
-        except Exception as e:
-            print('[CNJMolAssembler.get_final_mol].Exception', e.args)
+        except Exception:
+            logger.exception("get_final_mol failed")
             final_mol = Chem.MolFromSmiles('CC')
  
         if final_mol is None:
@@ -1185,8 +1198,8 @@ class CNJMolAssembler:
                                                            ctoken           = ctoken,
                                                            hparam           = hparam,
                                                            )
-        except Exception as e:
-            print(e.args)
+        except Exception:
+            logger.exception("Assemble_Mol failed")
             
         if dec_smile is not None:
             if isinstance(dec_smile, str):
@@ -1216,7 +1229,10 @@ class CNJMolAssembler:
 
             for i, sub_s in enumerate(sub_smils):
                 if not isinstance(sub_s, (str)):
-                    print(f'[test_rebuild_file is not a string-{i}:-{bfs_ex_smiles}]')
+                    logger.warning(
+                        "decode_single: item is not string",
+                        extra={"ctx": f"idx={i} value={bfs_ex_smiles}"},
+                    )
                     continue
                 else:
                     bfs_ex_smiles = CNJMolUtil.split_ex_smiles(sub_s, delimiter='^')
@@ -1226,7 +1242,10 @@ class CNJMolAssembler:
                     re_ex_smils+= '.'
 
                 if bfs_ex_smiles is None or len(bfs_ex_smiles) < 1:
-                    print(f'[test_rebuild_file is null or empty-{i}:-{bfs_ex_smiles}]')
+                    logger.warning(
+                        "decode_single: bfs_ex_smiles empty",
+                        extra={"ctx": f"idx={i} value={bfs_ex_smiles}"},
+                    )
                     continue
 
                 if len(bfs_ex_smiles) > ctoken.max_length:
@@ -1274,9 +1293,11 @@ class CNJMolAssembler:
                         else:
                             errors.append(bfs_ex_smiles)    
 
-        except Exception as e:
-            print('[CNJMolAssembler.decode_single].Exception:', e.args)
-            print('[CNJMolAssembler.decode_single].Exception:', bfs_ex_smiles)
+        except Exception:
+            logger.exception(
+                "decode_single failed",
+                extra={"ctx": f"bfs_ex_smiles={bfs_ex_smiles}"},
+            )
             re_smils = 'CC'
             bfs_ex_smiles = ['CC', '&', '&', '&']
             new_vocs = [['CC']]
@@ -1339,8 +1360,7 @@ def rebuild_file(n_samples = 1):
     #smlfile= r'../RawData/Example/mol.smi.[MMPA_DY][202]_TSISR.csv'
     smlfile= r'../RawData/Example/mol.smi.[MMPA_DY][202]_TSISD.csv'
     #-------------------------------
-    print(vocab_file)
-    print(smlfile)
+    logger.info("rebuild_file config", extra={"ctx": f"vocab={vocab_file} smlfile={smlfile}"})
  
     #asm_alg = 'CALG_TSSA'  
     #asm_alg = 'CALG_TSDY'  
@@ -1363,8 +1383,8 @@ def rebuild_file(n_samples = 1):
                 smiles_list[i] = ''.join(s.strip().split(' '))
             else:
                 smiles_list[i] = 'C'
-    except Exception as e:
-        print('Exception:', e.args)
+    except Exception:
+        logger.exception("rebuild_file input parse failed")
         return
 
 
@@ -1381,24 +1401,24 @@ def rebuild_file(n_samples = 1):
     output = smlfile + f'.re_smils[{n_samples}].smi'
     df = pd.DataFrame(re_smils_list)
     df.to_csv(output, index = False, header=False, na_rep="NULL")
-    print(output)
+    logger.info("rebuild_file output", extra={"ctx": f"path={output}"})
 
     output = smlfile + f'.errors[{n_samples}].csv'
     df = pd.DataFrame(errors)
     df.to_csv(output, index = False, header=False, na_rep="NULL")
-    print(output)
+    logger.info("rebuild_file output", extra={"ctx": f"path={output}"})
     
     output = smlfile + f'.skt_wrong[{sum(skt_wrong_list)}].csv'
     df = pd.DataFrame(skt_wrong_list)
     df.to_csv(output, index = False, header=False, na_rep="NULL")
-    print(output)
+    logger.info("rebuild_file output", extra={"ctx": f"path={output}"})
    
     new_vocs = [x for l in new_vocs for x in l] 
     new_vocs.sort()
     output = smlfile + f'.new_vocs[{n_samples}].smi'
     df = pd.DataFrame(list(set(new_vocs)))
     df.to_csv(output, index = False, header=False, na_rep="NULL")      
-    print(output)
+    logger.info("rebuild_file output", extra={"ctx": f"path={output}"})
 
     return
 
@@ -1431,7 +1451,7 @@ def test_decode():
     asm_alg = CODE_Alg.CALG_TSIS.name   
 
     bfs_ex = ''.join(tsmile.strip().split(' '))
-    print('input:=', bfs_ex)
+    logger.info("test_decode input", extra={"ctx": f"bfs_ex={bfs_ex}"})
 
 
     ctoken = CTokens(STDTokens_Frag_File(None))
@@ -1439,16 +1459,16 @@ def test_decode():
     #-----------------------------------------
 
     bfs_ex_smiles = CNJMolUtil.split_ex_smiles(bfs_ex, delimiter='^')
-    print('bfs_ex_smiles', bfs_ex_smiles)     
+    logger.info("test_decode bfs_ex_smiles", extra={"ctx": f"{bfs_ex_smiles}"})
     
     n_samples = 5
     for i in range(n_samples):
         #print('=====[n_samples]===== ',i)
         re_smils, bfs_ex_smiles_sub, new_vocs_sub, skt_wrong = CNJMolAssembler.decode_single(bfs_ex, ctoken , asm_alg, n_samples = 1, p_mean = None) 
-        print('dec_smile:=',         re_smils)
-        print('bfs_ex_smiles_sub:=', bfs_ex_smiles_sub)
-        print('new_vocs_sub:=',      new_vocs_sub)
-        print('skt_wrong:=',         skt_wrong)
+        logger.info("test_decode dec_smile", extra={"ctx": f"{re_smils}"})
+        logger.info("test_decode bfs_ex_smiles_sub", extra={"ctx": f"{bfs_ex_smiles_sub}"})
+        logger.info("test_decode new_vocs_sub", extra={"ctx": f"{new_vocs_sub}"})
+        logger.info("test_decode skt_wrong", extra={"ctx": f"{skt_wrong}"})
 
     return 
 
@@ -1457,4 +1477,5 @@ if __name__ == '__main__':
 
     #test_decode()
 
+    init_logging()
     rebuild_file()

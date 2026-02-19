@@ -3,11 +3,14 @@ import copy
 
 import rdkit
 from rdkit import Chem
+import logging
 
 from Levenshtein import distance as levenshtein   #pip install python-Levenshtein
 
 from t_smiles.dataset.std_tokens import CTokens
 from t_smiles.mol_utils.rdk_utils.rdk_enumerator import RDKEnumerateSmiles
+
+logger = logging.getLogger(__name__)
 
 class CNJMolUtil:
     def valid_smiles(sml, ctoken = None, 
@@ -32,11 +35,17 @@ class CNJMolUtil:
                     else:
                         osml =  CNJMolUtil.find_best_match(sml, ctoken) 
              
-                print(f'node smile [{sml}] is invalid, which is replaced by [{osml}]')
+                logger.warning(
+                    "Invalid SMILES replaced",
+                    extra={"ctx": f"smiles={sml} replaced={osml}"},
+                )
             else:
                 osml = sml
-        except Exception as e:
-            print('[CNJMolUtil.valid_smiles].exception:', e.args)
+        except Exception:
+            logger.exception(
+                "CNJMolUtil.valid_smiles failed",
+                extra={"ctx": f"smiles={sml}"},
+            )
 
         return osml
 
@@ -58,8 +67,11 @@ class CNJMolUtil:
             if sml.find('*') != -1:
                 if min_token.find('*') == -1:
                     min_token = '*' + min_token
-        except Exception as e:
-            print('[CNJMolUtil.find_best_match].Exception', e.args)
+        except Exception:
+            logger.exception(
+                "CNJMolUtil.find_best_match failed",
+                extra={"ctx": f"smiles={sml}"},
+            )
         
         return min_token
 
@@ -144,4 +156,3 @@ if __name__ == '__main__':
 
     #preprocess()
     pass
-
